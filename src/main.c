@@ -7,10 +7,17 @@
 #define SIG_TCS     (SIGRTMIN + 0) // tcs
 #define SIG_THERMAL (SIGRTMIN + 1) // thermal
 
+double start_timestamp = 0.0;
+
 int main(void) {
 
     VehicleState vs;
     vehicle_state_init(&vs);
+
+    // T = 0
+    struct timespec start_time;
+    clock_gettime(CLOCK_MONOTONIC, &start_time);
+    start_timestamp = start_time.tv_sec + (start_time.tv_nsec / 1e9);
 
     sigset_t set;
     sigemptyset(&set);

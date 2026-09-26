@@ -3,6 +3,7 @@
 
 #include "tasks.h"
 #include "time.h"
+#include "utils.h"
 
 #define PERIOD_ESC_NS 20000000L // tau1: 20 ms = 50 hz
 
@@ -13,13 +14,21 @@
 void* task_esc(void* arg) {
 
     VehicleState* vs = (VehicleState*)arg;
-    
+
     struct timespec next;
     clock_gettime(CLOCK_MONOTONIC, &next);
 
     float t = 0.0;
 
-    while (1) {
+    for (int cycle = 0; cycle < CYCLES_ESC; cycle++) {
+
+        // Obtener tiempo
+        struct timespec current_time;
+        clock_gettime(CLOCK_MONOTONIC, &current_time);
+        double current_abs = current_time.tv_sec + (current_time.tv_nsec / 1e9);
+
+        // T_Real
+        double real_timestamp = current_abs - start_timestamp;
         
         // Simulacion de sensores
         float vehicle_speed = 60.0 + 5.0 * sin(t);
@@ -39,8 +48,8 @@ void* task_esc(void* arg) {
         pthread_cond_signal(&vs->esc_ready_cond);
         pthread_mutex_unlock(&vs->lock);
 
-        printf("TAREA1: t=%.2f  v=%.2f km/h  ruedas=[%.2f %.2f %.2f %.2f]\n",
-               t, vehicle_speed, wheel[0], wheel[1], wheel[2], wheel[3]);
+        printf("[TAREA1 - Ciclo %3d] T_Real=%.6f s | T_Teorico=%.2f | v=%.2f km/h, ruedas=[%.2f %.2f %.2f %.2f]\n",
+               cycle, real_timestamp, t, vehicle_speed, wheel[0], wheel[1], wheel[2], wheel[3]);
 
         t += 0.02;
         timespec_add_ns(&next, PERIOD_ESC_NS);

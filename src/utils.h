@@ -7,6 +7,16 @@
 #include <pthread.h>  // pthread_sigmask
 #include <stdio.h>    // printf
 
+// Ciclos
+#define SIM_TIME_SEC 5 // 5s Sim
+
+#define CYCLES_ESC (SIM_TIME_SEC * 1000 / 20)  // tau1 (500 ciclos)
+#define CYCLES_TCS (SIM_TIME_SEC * 1000 / 40)  // tau2 (250 ciclos)
+#define CYCLES_INJ (SIM_TIME_SEC * 1000 / 80)  // tau3 (125 ciclos)
+#define CYCLES_THEM (SIM_TIME_SEC * 1000 / 200) // tau4 (50 ciclos)
+
+extern double start_timestamp; // Almacenar tiempo de inicio
+
 // CLocks
 
 #define NSEC_PER_SEC 1000000000L

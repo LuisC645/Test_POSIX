@@ -17,7 +17,15 @@ void* task_tcs(void* arg) {
     struct periodic_task pt;
     start_periodic_timer(&pt, SIG_TCS, OFFSET_TCS_NS, PERIOD_TCS_NS);
 
-    while (1) {
+    for (int cycle = 0; cycle < CYCLES_TCS; cycle++) {
+
+        // Obtener tiempo
+        struct timespec current_time;
+        clock_gettime(CLOCK_MONOTONIC, &current_time);
+        double current_abs = current_time.tv_sec + (current_time.tv_nsec / 1e9);
+
+        // T_Real
+        double real_timestamp = current_abs - start_timestamp;
 
         wait_next_activation(&pt);
 
@@ -40,7 +48,9 @@ void* task_tcs(void* arg) {
 
         pthread_mutex_unlock(&vs->lock);
 
-        printf("[tau2-TCS] slip_diff=%.2f km/h  reduccion=%.1f%%\n", slip_diff, vs->throttle_reduction_pct);
+        double t_teorico = cycle * 0.040; // 40 ms = 0.040 segundos
+        printf("[TAREA2 - Ciclo %3d] T_Real=%.6f s | T_Teorico=%.2f | slip_diff=%.2f, throttle=%.1f%%\n",
+                cycle, real_timestamp, t_teorico, slip_diff, vs->throttle_reduction_pct);
     }
     return NULL;
 }
